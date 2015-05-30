@@ -1,0 +1,11 @@
+*~
+.tmp
+
+.sass-cache
+/.bundle
+
+/.idea
+/*.log
+/*.xml
+/results/*.*
+
