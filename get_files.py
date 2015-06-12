@@ -1,4 +1,4 @@
-__author__ = 'j'
+__author__ = 'jerzydem'
 
 
 def get_page(name, index):
@@ -31,7 +31,7 @@ def get_page(name, index):
         get_page(name, index)
     else:
         print(index, " Name: ", name, " ", encoded_url)
-        f = open('results2/' + str(index) + "_" +slugify(name) + ".html", 'wb')
+        f = open('results2/' + str(index) + "_" + slugify(name) + ".html", 'wb')
         f.write(web_content)
         f.close
 
@@ -46,7 +46,7 @@ def csv_get_all_pages(csv_file):
 
     rownum = 0
     for row in reader:
-        if rownum > 297:
+        if rownum > 0:
             name = row[1]
             get_page(name, rownum)
         rownum += 1

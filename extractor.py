@@ -1,24 +1,39 @@
 __author__ = 'j'
-
-
-from bs4 import BeautifulSoup
+import os
 import csv
+folder_path = "/home/j/Projects/bs_scraper/results2"
 
-soup = BeautifulSoup(open("/home/j/Projects/bs_scraper/results2/1_abrahamowicz-dawid-1839-1926.html"))
+def get_page_data(page_source):
+    from slugify import slugify
+    from bs4 import BeautifulSoup
 
-# print(soup.table.prettify())
-table = soup.find('table', cellspacing="2", cellpadding="0")
-print(table)
+    soup = BeautifulSoup(open(page_source))
+    table = soup.find('table', cellspacing="2", cellpadding="0")
 
-# final_link = soup.p.a
-# # final_link.decompose()
-#
-# f = csv.writer(open("sejm.csv", "w"))
-# f.writerow(["Name", "Link"])    # Write column headers as the first line
-#
-# links = soup.find_all('a')
-# for link in links:
-#     names = link.contents[0]
-#     fullLink = link.get('href')
-#
-#     f.writerow([names,fullLink])
+    rows_list = table.find_all('tr')
+    results = {}
+    content_id = None
+    for row in rows_list:
+        cells = row.find_all('td')
+        label = slugify(cells[0].string)
+        value = cells[1].string
+        # print(label, ": ", value)
+        if value is not None:
+            if len(label) > 0:
+                content_id = label
+                results[content_id] = value
+            else:
+                results[content_id] += value
+
+    return results
+
+
+# TODO test opening files from folder. Base on
+#  http://stackoverflow.com/questions/18262293/python-open-every-file-in-a-folder
+for filename in os.listdir(folder_path):
+    results_list = []
+    results_list.append(get_page_data(folder_path+ '/' + filename))
+
+
+
+
