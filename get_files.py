@@ -9,8 +9,8 @@ def get_page(name, index):
     import time
     from slugify import slugify
 
-    names_table = name.replace('?', ' ').replace('-', ' ').split()
-    name_query = '';
+    names_table = name.replace('?', ' ').replace('-', ' ').replace('(', ' ').replace(')', ' ').split()
+    name_query = ''
     for token in names_table:
         if token != "ksiądz":
             name_query += urllib.parse.quote(token)
@@ -18,7 +18,7 @@ def get_page(name, index):
 
 
     encoded_url = "https://bs.sejm.gov.pl/F/?func=find-b&request=" + name_query + \
-                  "&find_code=WRD&adjacent=N&x=27&y=6&local_base=ars10"
+                  "&find_code=WPN&adjacent=N&x=27&y=6&local_base=ars10"
 
     response = urllib.request.urlopen(encoded_url)
     web_content = response.read()
@@ -31,7 +31,7 @@ def get_page(name, index):
         get_page(name, index)
     else:
         print(index, " Name: ", name, " ", encoded_url)
-        f = open('results2/' + str(index) + "_" + slugify(name) + ".html", 'wb')
+        f = open('results3/' + str(index) + "_" + slugify(name) + ".html", 'wb')
         f.write(web_content)
         f.close
 
@@ -46,7 +46,7 @@ def csv_get_all_pages(csv_file):
 
     rownum = 0
     for row in reader:
-        if rownum > 0:
+        if rownum > 208:
             name = row[1]
             get_page(name, rownum)
         rownum += 1
