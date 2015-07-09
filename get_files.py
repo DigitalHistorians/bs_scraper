@@ -1,5 +1,5 @@
 __author__ = 'jerzydem'
-
+import sys
 
 def get_page(name, index):
 
@@ -9,7 +9,9 @@ def get_page(name, index):
     import time
     from slugify import slugify
 
+
     names_table = name.replace('?', ' ').replace('-', ' ').replace('(', ' ').replace(')', ' ').split()
+
     name_query = ''
     for token in names_table:
         if token != "ksiądz":
@@ -37,20 +39,43 @@ def get_page(name, index):
 
 
 
-def csv_get_all_pages(csv_file):
-    import time
+def csv_get_all_pages(csv_file, start_line):
     import csv
 
-    ifile  = open(csv_file)
-    reader = csv.reader(ifile, delimiter=',')
+    input_file = open(csv_file)
+    # open csv and get rows
+    reader = csv.reader(input_file, delimiter=',')
 
-    rownum = 0
+    rows_num = 0
     for row in reader:
-        if rownum > 208:
+        # ignore row if its lower then start_line
+        if rows_num > start_line-1:
             name = row[1]
-            get_page(name, rownum)
-        rownum += 1
+            get_page(name, rows_num)
+        rows_num += 1
 
-    ifile.close()
+    input_file.close()
 
-csv_get_all_pages("files/sejm_ustawodawczy.csv")
+
+# INITIALIZATION
+
+# CONSTANT VALUES
+DEPUTIES_CSV = "files/sejm_ustawodawczy.csv"
+START_LINE = 209
+
+
+# USE INIT INLINE ARGUMENTS
+# TODO add short form of "if"
+# TODO - test it
+if len(sys.argv) > 1:
+    start_row = sys.argv[1]
+    if len(sys.argv) > 2:
+        input_csv = sys.argv[2]
+    else:
+        input_csv = DEPUTIES_CSV
+else:
+    start_row = START_LINE
+
+
+
+csv_get_all_pages(input_csv, start_row)
