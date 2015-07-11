@@ -3,8 +3,8 @@ BS Scraper is script to download and extract to csv biographic data from ["Bibli
 
 ## Dependencies
 BS Scraper need following Python 3 libraries:
- -  urllib
- -  slugify
+ - urllib
+ - slugify
  - time
  - csv
  - BeautifulSoup
@@ -21,6 +21,6 @@ python3 get_files.py start_num input_csv
 `start_num` - optional: start row in input_csv
 
 
-## extract data
+## Extract data
 
 To extract data run extractor.py
