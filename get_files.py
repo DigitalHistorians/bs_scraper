@@ -43,7 +43,7 @@ def get_page(name, index):
     # detect if server is down. When server is down, result pages are very small
     if size < 1000:
         # BS Server down
-        print('SERVER OFF {:>4} {} SIZE: {}'.format(index, encoded_url, size))
+        print('SERVER OFF {:>4} {} SIZE: {}'.format(index, url, size))
         time.sleep(5)
         get_page(name, index)
     else:
