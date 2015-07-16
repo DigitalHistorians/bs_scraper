@@ -14,11 +14,11 @@ BS Scraper need following Python 3 libraries:
 To download html files run get_files.py
 
 ```
-python3 get_files.py start_num input_csv
+python3 get_files.py input_csv start_num
 ```
 
-`input_csv` - optional: input_csv with names (format: NUMBER, NAME)
 `start_num` - optional: start row in input_csv
+`input_csv` - optional: input_csv with names (format: NUMBER, NAME)
 
 
 ## Extract data
