@@ -76,9 +76,9 @@ def init_getter():
     import sys
 
     # CONSTANT VALUES
-    INPUT_CSV = "files/sejm_ustawodawczy.csv"
+    INPUT_CSV = ""
     START_LINE = 1
-    DESTINATION_FOLDER = 'sejm_i/html/'
+    DESTINATION_FOLDER = 'sejm_ii/html/'
 
 
     # INLINE ARGUMENTS

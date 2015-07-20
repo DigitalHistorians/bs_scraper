@@ -52,10 +52,12 @@ def extract_data_from_table(source_table):
 
         if label == 'biografia':
             # get extra columns from 'biografia'
-
+            text = cells[1].get_text().strip()
+            if text[-1] != '.':
+                text += '.'
             content_id = label
-            results[content_id] = cells[1].get_text().strip()
-            results['miejsce-i-rok-urodzenia'] = cells[1].get_text().strip()
+            results[content_id] = text
+            results['miejsce-i-rok-urodzenia'] = text
 
             birth_year = get_year(cells[1])
 
@@ -106,8 +108,15 @@ def extract_data_from_table(source_table):
 
             if content_id == 'biografia':
                 # it's second row of 'biografia'
-                results[content_id] += cells[1].get_text().strip()
-                results['miejsce-i-rok-smierci'] = cells[1].get_text().strip()
+                text = cells[1].get_text().strip()
+                if text[-1] != '.':
+                    print(text)
+                    text += '.'
+
+                    print(text[-1])
+
+                results[content_id] += text
+                results['miejsce-i-rok-smierci'] = text
                 death_year = get_year(cells[1])
 
                 if death_year:
@@ -130,6 +139,7 @@ def extract_data_from_table(source_table):
 
 def get_image(soup):
     # find in soup url of photo
+    # TODO - add full url
     result = None
     image_table = soup.find('table', border="0", cellpadding="10", cellspacing="0")
 
@@ -240,14 +250,14 @@ def init_extractor():
     import sys
 
     HTML_FOLDER = 'sejm_ustawodawczy/html/'
-    OUTPUT_CSV = "sejm_ustawodawczy/output_sejm_ustawodawczy_ii_rp.csv"
+    OUTPUT_CSV = "sejm_ustawodawczy/extracted_sejm_ustawodawczy_ii_rp.csv"
 
     results_list = []
     index = 0
 
     # INLINE ARGUMENTS
     # use inline arguments if exist
-    html_files_folder = int(sys.argv[1]) if len(sys.argv) > 1 else HTML_FOLDER
+    html_files_folder = sys.argv[1] if len(sys.argv) > 1 else HTML_FOLDER
     output_csv_file = sys.argv[2] if len(sys.argv) > 2 else OUTPUT_CSV
 
     # iterate in HTML_FOLDER and extract data from every file
