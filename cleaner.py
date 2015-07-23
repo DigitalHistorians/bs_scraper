@@ -37,6 +37,7 @@ def get_csv_headers(results_list):
                 label_index += 1
 
         result_index += 1
+    headers.sort()
     return headers
 
 
@@ -256,7 +257,6 @@ def init_cleaner():
                     obj['miejsce-smierci'] = get_place(cell_str)
 
                 elif cell_header == 'miejsce-i-rok-urodzenia':
-                    print("MIEJSCE I ROK URODZENIA")
                     cell_str = replace_abbreviations(cell)
 
                     obj[cell_header] = replace_abbreviations(cell_str)
