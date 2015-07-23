@@ -110,10 +110,7 @@ def extract_data_from_table(source_table):
                 # it's second row of 'biografia'
                 text = cells[1].get_text().strip()
                 if text[-1] != '.':
-                    print(text)
                     text += '.'
-
-                    print(text[-1])
 
                 results[content_id] += text
                 results['miejsce-i-rok-smierci'] = text
@@ -141,10 +138,11 @@ def get_image(soup):
     # find in soup url of photo
     # TODO - add full url
     result = None
+    url = 'https://bs.sejm.gov.pl'
     image_table = soup.find('table', border="0", cellpadding="10", cellspacing="0")
 
     if image_table:
-        result = image_table.find('img').get('src')
+        result = url + image_table.find('img').get('src')
 
     return result
 

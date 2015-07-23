@@ -18,7 +18,7 @@ def get_csv_headers(results_list):
     # DUPLICATE FUNCTION IN extractor.py
     # TODO - remove duplication
     # prepare list of columns headers for csv file
-
+    # TODO add sort for header
     headers = []
     result_index = 0
 
@@ -37,7 +37,6 @@ def get_csv_headers(results_list):
                 label_index += 1
 
         result_index += 1
-
     return headers
 
 
@@ -75,41 +74,68 @@ def save_to_csv(results_list, name):
         result_index += 1
 
 
-def clean_place_and_year(str):
-    # print(str.replace('k.', 'koło').replace('pow.', 'powiat'))
-    return str.replace('k.', 'koło').replace('pow.', 'powiat').replace('n.', 'nad')
+def find_regex_value(patterns_list, string):
+    import re
+    pattern = patterns_list[0]
+    r = re.compile(pattern)
+    m = r.match(string)
+    if m:
+        return m.group(1)
+    elif len(patterns_list) <= 1:
+        return None
+    else:
+        return find_regex_value(patterns_list[1:], string)
 
 
-def get_first_part(str):
+def replace_abbreviations(string):
+    return string.replace(' k.', ' koło').replace(' pow.', ' powiat').replace(' n.', ' nad')
+
+
+def get_first_part(string):
     # TODO refactor names and method
-    index = len(str)
-    srednik = str.find(';')
-    dot = str.find('.')
-    coma = str.find(',')
+    index = len(string)
+    srednik = string.find(';')
+    dot = string.find('.')
+    coma = string.find(',')
     index = srednik if srednik > 1 and srednik < index else index
     index = dot if dot > 1 and dot < index else index
     index = coma if coma > 1 and coma < index else index
 
     # print (str.substr(0,index))
-    return  str.substr(0,index)
+    return  string.substr(0,index)
 
 
-def get_date(str):
+def find_regex_value(patterns_list, string):
     import re
+    pattern = patterns_list[0]
+    r = re.compile(pattern)
+    m = r.match(string)
+    if m:
+        return m.group(1)
+    elif len(patterns_list) <= 1:
+        return None
+    else:
+        return find_regex_value(patterns_list[1:], string)
+
+def get_date(string):
 
     pattern_date = r'^[AZ]{1}m\. (?P<date>\d{1,2}\.\d{1,2}\.\d{4})'
     pattern_year = r'^[A-Z][a-z][\w\W]+(?P<year>\d{4})[\w\W]+'
 
-    r = re.compile(pattern_date)
-    m = r.match(str)
-    if not m:
-        # if can't find full date - looking for year
-        r = re.compile(pattern_year)
-        m = r.match(str)
+    patterns_list = [pattern_date, pattern_year]
+    return find_regex_value(patterns_list, string)
 
-    if m:
-        return m.group(1)
-    return None
+
+    # r = re.compile(pattern_date)
+    # m = r.match(str)
+    # if not m:
+    #     # if can't find full date - looking for year
+    #     r = re.compile(pattern_year)
+    #     m = r.match(str)
+    #
+    # if m:
+    #     return m.group(1)
+    # return None
 
 # def get_place(str):
 #     # TODO refactor name and method
@@ -117,32 +143,65 @@ def get_date(str):
 #         place = str.split('ochowany')[1]
 #         print(place[1])
 
-
-def get_place(str):
-    import re
-    # TODO get second word if needed
-
-    pattern_place = r'^[AZ]{1}m\. \d{1,2}\.\d{1,2}\.\d{4}\,?\s([A-ZŚĆŹŻÓŃŁ][a-zśćźżąęóńł]+)'
-    pattern_in_place = r'^[A-ZŚĆŹŻÓŃŁ][a-zśćźżąęóńł][\w\W]+\d{4}[a-zśćźżąęóńł\s\w]*\sw\s[a-zśćźżąęóńł\s]*([A-ZŚĆŹŻÓŃŁ][a-zśćźżąęóńł]+)'
-
-    clean_str = clean_place_and_year(str)
-    r = re.compile(pattern_place)
-    m = r.match(clean_str)
-    if not m:
-         # if can't find simple place - looking for place after 'w'
-         r = re.compile(pattern_in_place)
-         m = r.match(str)
-         if m:
-             str = m.group(1)
-             # TODO add if() to correct names
+def place_nominative(place):
+    # TODO make this function - check last chars and replace
+    return place
 
 
-             return str
-         else:
-             return None
+def convert_place(place_str):
+
+    tokens = place_str.split()
+    if tokens[0] == 'w':
+        pattern = '[a-zśćźżąęóńł\s]*([A-ZŚĆŹŻÓŃŁ][a-zśćźżąęóńł]+[\w\W]+$)'
+        place = find_regex_value([pattern], place_str)
+        if place_str.find('obozie') > 0:
+            return place
+        else:
+            return place_nominative(place)
     else:
-        return m.group(1)
+        return place_str
+
+
+def get_place(string):
+    # TODO get second word if needed - recognize first word of place and get all string to end signs (;,.)
+
+    pattern1_place = r'^[A-Z][a-z][\w\W]+\d{1,2}\.\d{1,2}\.\d{4}\,?\s([A-ZŚĆŹŻÓŃŁ][a-zśćźżąęóńłA-ZŚĆŹŻÓŃŁ\-\(\)]+)'
+    pattern2_place_only_year = r'^[A-Z][a-z][\w\W]+\d{4}\,?\s([A-ZŚĆŹŻÓŃŁ][a-zśćźżąęóńłA-ZŚĆŹŻÓŃŁ\-\(\)]+)'
+    pattern3_place_string_month =r'^[A-Z][a-z][\w\W]+\d{4}\,[a-zśćźżąęóńł\s]*\,\s([A-ZŚĆŹŻÓŃŁ][a-zśćźżąęóńłA-ZŚĆŹŻÓŃŁ\-\(\)]+)'
+    pattern4_in_place = '^[A-Z][a-z][\w\W]+\d{1,2}\.\d{1,2}\.\d{4}[a-zśćźżąęóńł\s]*[\,]?\s(w\s[a-zśćźżąęóńł\s]*[A-ZŚĆŹŻÓŃŁ][a-zśćźżąęóńłA-ZŚĆŹŻÓŃŁ\-\(\)]+)'
+    pattern5_in_place_only_year = r'^[A-Z][a-z][\w\W]+\d{4}[a-zśćźżąęóńł\s]*[\,]?\s(w\s[a-zśćźżąęóńł\s]*[A-ZŚĆŹŻÓŃŁ][a-zśćźżąęóńłA-ZŚĆŹŻÓŃŁ\-\(\)]+)'
+
+    patterns_list = [
+        pattern1_place,
+        pattern2_place_only_year,
+        pattern3_place_string_month,
+        pattern4_in_place,
+        pattern5_in_place_only_year
+    ]
+
+    place_str = find_regex_value(patterns_list, string)
+    if place_str:
+        return convert_place(place_str)
     return None
+
+    # clean_str = clean_place_and_year(str)
+    # r = re.compile(pattern_place)
+    # m = r.match(clean_str)
+    # if not m:
+    #      # if can't find simple place - looking for place after 'w'
+    #      r = re.compile(pattern_in_place)
+    #      m = r.match(str)
+    #      if m:
+    #          str = m.group(1)
+    #          # TODO add if() to correct names
+    #
+    #
+    #          return str
+    #      else:
+    #          return None
+    # else:
+    #     return m.group(1)
+    # return None
 
 #     # TODO - get from str words with first capital letters. Ignore when
 #     place = None
@@ -189,11 +248,20 @@ def init_cleaner():
                 # print('coll: ', coll_num, 'cell: ', cell, 'row_num: ', row_num, 'row: ', row)
                 # print(headers[coll_num])
                 if cell_header == 'miejsce-i-rok-smierci':
-                    str = clean_place_and_year(cell)
-                    obj['data-smierci'] = get_date(str)
-                    obj[cell_header] = clean_place_and_year(str)
-                    obj['miejsce-smierci'] = get_place(str)
-                    # get_grave_place(cell)
+
+                    cell_str = replace_abbreviations(cell)
+
+                    obj[cell_header] = replace_abbreviations(cell_str)
+                    obj['data-smierci'] = get_date(cell_str)
+                    obj['miejsce-smierci'] = get_place(cell_str)
+
+                elif cell_header == 'miejsce-i-rok-urodzenia':
+                    print("MIEJSCE I ROK URODZENIA")
+                    cell_str = replace_abbreviations(cell)
+
+                    obj[cell_header] = replace_abbreviations(cell_str)
+                    obj['data-urodzenia'] = get_date(cell_str)
+                    obj['miejsce-urodzenia'] = get_place(cell_str)
                 else:
                     # print(stripNonAlphaNum(cell))
                     obj[cell_header] = cell
