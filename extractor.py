@@ -136,10 +136,10 @@ def extract_data_from_table(source_table):
 
 def get_image(soup):
     # find in soup url of photo
-    # TODO - add full url
+    # TODO - remove - hash change in database url
     result = None
     url = 'https://bs.sejm.gov.pl'
-    image_table = soup.find('table', border="0", cellpadding="10", cellspacing="0")
+    image_table = soup.find('table', border='0', cellpadding='10', cellspacing='0')
 
     if image_table:
         result = url + image_table.find('img').get('src')
@@ -248,7 +248,7 @@ def init_extractor():
     import sys
 
     HTML_FOLDER = 'sejm_ustawodawczy/html/'
-    OUTPUT_CSV = "sejm_ustawodawczy/extracted_sejm_ustawodawczy_ii_rp.csv"
+    OUTPUT_CSV = 'sejm_ustawodawczy/extracted_sejm_ustawodawczy_ii_rp.csv'
 
     results_list = []
     index = 0

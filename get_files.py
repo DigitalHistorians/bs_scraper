@@ -1,5 +1,9 @@
 __author__ = 'jerzydem'
 
+# TODO
+# def  get_image
+
+
 def prepare_page_url(name):
     import urllib
     refine_name = name.replace('?', ' ').replace('-', ' ').replace('(', ' ').replace(')', ' ');
@@ -9,14 +13,14 @@ def prepare_page_url(name):
     # prepare url query
     name_query = ''
     for token in names_table:
-        # ignore token "ksiądz"
-        if token != "ksiądz":
+        # ignore token 'ksiądz'
+        if token != 'ksiądz':
             name_query += urllib.parse.quote(token)
-            name_query += "+"
+            name_query += '+'
 
 
-    encoded_url = "https://bs.sejm.gov.pl/F/?func=find-b&request=" + name_query + \
-                  "&find_code=WPN&adjacent=N&x=27&y=6&local_base=ars10"
+    encoded_url = 'https://bs.sejm.gov.pl/F/?func=find-b&request=' + name_query + \
+                  '&find_code=WPN&adjacent=N&x=27&y=6&local_base=ars10'
     return encoded_url
 
 def get_page(name, index, destination):
@@ -45,11 +49,13 @@ def get_page(name, index, destination):
         get_page(name, index, destination)
     else:
         # Page size is enough. Save page
-        print(index, " Name: ", name, " ", url)
-        f = open(destination + str(index) + "_" + slugify(name) + ".html", 'wb')
+        print(index, ' Name: ', name, ' ', url)
+        f = open(destination + str(index) + '_' + slugify(name) + '.html', 'wb')
         f.write(web_content)
         f.close
 
+#def get_image(web_content):
+    # TODO finish it
 
 
 def csv_get_all_pages(csv_file, start_line, destination):
@@ -76,7 +82,7 @@ def init_getter():
     import sys
 
     # CONSTANT VALUES
-    INPUT_CSV = ""
+    INPUT_CSV = ''
     START_LINE = 1
     DESTINATION_FOLDER = 'sejm_ii/html/'
 
