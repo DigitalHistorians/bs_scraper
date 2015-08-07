@@ -48,6 +48,10 @@ def extract_data_from_table(source_table):
 
     for row in rows_list:
         cells = row.find_all('td', recursive=False)
+
+        if len(cells) < 1:
+            print("EXTRACTOR ERROR")
+            return
         label = slugify(cells[0].string)
 
         if label == 'biografia':

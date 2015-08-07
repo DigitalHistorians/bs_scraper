@@ -23,6 +23,7 @@ def prepare_page_url(name):
                   '&find_code=WPN&adjacent=N&x=27&y=6&local_base=ars10'
     return encoded_url
 
+
 def get_page(name, index, destination):
     # init page url preparation and save html in destination folder
 
@@ -37,25 +38,72 @@ def get_page(name, index, destination):
     response = urllib.request.urlopen(url)
     web_content = response.read()
     size = sys.getsizeof(web_content)
-
-    # 5 seconds timeout to limit server pauses
-    time.sleep(5)
+    slug_name = slugify(name)
 
     # detect if server is down. When server is down, result pages are very small
     if size < 1000:
         # BS Server down
         print('SERVER OFF {:>4} {} SIZE: {}'.format(index, url, size))
-        time.sleep(5)
+        time.sleep(4)
         get_page(name, index, destination)
     else:
         # Page size is enough. Save page
         print(index, ' Name: ', name, ' ', url)
-        f = open(destination + str(index) + '_' + slugify(name) + '.html', 'wb')
+        file_name = destination + 'html/' + str(index) + '_' + slug_name + '.html'
+        f = open(file_name, 'wb')
         f.write(web_content)
         f.close
+        get_image_url(file_name, slug_name, destination + 'img/')
 
-#def get_image(web_content):
-    # TODO finish it
+    # 5 seconds timeout to limit server pauses
+    time.sleep(3)
+
+
+def download_image(url, name, destination):
+    import urllib.request
+    import urllib.parse
+    response = urllib.request.urlopen(url)
+    web_content = response.read()
+    f = open(destination + name + '.jpg', 'wb')
+    f.write(web_content)
+    f.close
+
+
+def get_image_url(file_path, name, destination):
+    from bs4 import BeautifulSoup
+
+    server_url = 'https://bs.sejm.gov.pl/'
+    # pattern = r'^javascript\:open\_window\(\"([\w\W]*)\"\)\;$'
+
+    # print("GET IMAGE: ", file_path)
+    soup = BeautifulSoup(open(file_path))
+    image_cell = soup.body.find('td', align="center", valign="top", style="padding-top: 8px;");
+    if image_cell:
+        href = image_cell.a['href']
+        full_src = server_url + image_cell.a.img['src']
+
+        # get url of big
+        # r = re.compile(pattern)
+        # m = r.match(href)
+        # print("Small: ", full_src)
+        download_image(full_src, name, destination)
+        # if m:
+        #     full_href = server_url + '/F/' + m.group(1)
+        #     print('Full href: ', full_href)
+        #     download_image(full_href, 'big_' + name)
+
+
+def find_regex_value(patterns_list, string):
+    import re
+    pattern = patterns_list[0]
+    r = re.compile(pattern)
+    m = r.match(string)
+    if m:
+        return m.group(1)
+    elif len(patterns_list) <= 1:
+        return None
+    else:
+        return find_regex_value(patterns_list[1:], string)
 
 
 def csv_get_all_pages(csv_file, start_line, destination):
@@ -91,7 +139,7 @@ def init_getter():
     # use inline arguments if exist
     input_csv = sys.argv[1] if len(sys.argv) > 1 else INPUT_CSV
     start_row = int(sys.argv[2]) if len(sys.argv) > 2 else START_LINE
-    destination_folder = sys.argv[3] if len(sys.argv) > 3 else DESTINATION_FOLDER
+    destination_folder = sys.argv[3] + '/' if len(sys.argv) > 3 else DESTINATION_FOLDER
 
     csv_get_all_pages(input_csv, start_row, destination_folder)
 
